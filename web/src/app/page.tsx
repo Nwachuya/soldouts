@@ -13,6 +13,7 @@ import {
   RefreshCw,
   ShieldAlert,
   SkipForward,
+  Sparkles,
   Wrench,
 } from "lucide-react";
 import type { EnrichedSoldout, MarkInfo, RepInfo } from "@/lib/enrich";
@@ -69,6 +70,30 @@ export default function HomePage() {
           ? data.routing_switch.suppress_soldout_tasks
           : null
       );
+      if (typeof window !== "undefined") {
+        if (data.mode === "live_sandbox") {
+          try {
+            window.localStorage.setItem("soldouts:last_payload", JSON.stringify(data));
+          } catch {
+            // ignore storage quota errors
+          }
+        }
+        window.dispatchEvent(
+          new CustomEvent("soldouts:sync-status", {
+            detail: { mode: data.mode ?? "offline_fallback", ...(data.cache_status ?? {}) },
+          })
+        );
+      }
+    } catch {
+      if (typeof window !== "undefined") {
+        const cached = window.localStorage.getItem("soldouts:last_payload");
+        if (cached) {
+          const data = JSON.parse(cached);
+          setItems(data.items ?? []);
+          setReps(data.reps ?? []);
+          setMode("offline_cached");
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -76,6 +101,9 @@ export default function HomePage() {
 
   useEffect(() => {
     loadData();
+    const onRefresh = () => loadData();
+    window.addEventListener("soldouts:refresh", onRefresh);
+    return () => window.removeEventListener("soldouts:refresh", onRefresh);
   }, []);
 
   function handleMarkUpdated(merchantId: string, newMark: MarkInfo | null) {
@@ -141,7 +169,11 @@ export default function HomePage() {
             <p className="text-eyebrow">Morning Restock Triage</p>
             <h1>Today&apos;s Sold-Outs</h1>
             <p className="text-caption mt-1">
-              {mode === "live_sandbox" ? "Live Sandbox API" : "Offline Snapshot"}
+              {mode === "live_sandbox"
+                ? "Live Sandbox API"
+                : mode === "offline_cached"
+                ? "Offline (Cached Live Snapshot)"
+                : "Offline (Bundled Snapshot)"}
               {switchState !== null && ` · Routing suppression switch: ${switchState ? "ON" : "OFF"}`}
             </p>
           </div>
@@ -249,6 +281,12 @@ export default function HomePage() {
                         <ActionIcon action={item.valuation.action} />
                         <span>{item.valuation.action_label}</span>
                       </span>
+                      {item.pending_ai && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-amber-300 bg-amber-50 text-amber-800 font-semibold">
+                          <Sparkles className="w-3 h-3 shrink-0" />
+                          <span>Pending AI</span>
+                        </span>
+                      )}
                       <span className="text-caption">
                         Band {item.size_band} · {item.category} · {item.deal_id}
                       </span>

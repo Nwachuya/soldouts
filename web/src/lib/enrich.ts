@@ -1,4 +1,6 @@
 import bundleRaw from "@/data/bundle.json";
+import type { CachedSignalEntry } from "@/lib/cacheStore";
+import { computeMerchantTextHash, type TextSnippet } from "@/lib/textHash";
 import { evaluateSoldout, type ValuationResult } from "@/lib/valuation";
 
 export interface RepInfo {
@@ -59,6 +61,8 @@ export interface EnrichedSoldout {
   signal: SignalInfo;
   mark: MarkInfo | null;
   valuation: ValuationResult;
+  pending_ai: boolean;
+  text_hash: string;
 }
 
 interface MerchantHistory {
@@ -108,14 +112,39 @@ export function getMerchantSignal(merchantId: string): SignalInfo {
   );
 }
 
+export function getBundleTextSnippets(merchantId: string): TextSnippet[] {
+  const hist = BUNDLE.history?.[merchantId];
+  if (!hist) return [];
+  const snippets: TextSnippet[] = [];
+  for (const n of hist.notes ?? []) {
+    snippets.push({ source_type: "rep_note", id: String(n.note_id ?? ""), date: String(n.created_at ?? ""), text: String(n.text ?? "") });
+  }
+  for (const r of hist.replies ?? []) {
+    snippets.push({ source_type: "deal_alert_reply", id: String(r.reply_id ?? ""), date: String(r.received_at ?? ""), text: String(r.text ?? "") });
+  }
+  for (const rv of hist.reviews ?? []) {
+    snippets.push({ source_type: "review", id: String(rv.review_id ?? ""), date: String(rv.created_at ?? ""), text: String(rv.text ?? "") });
+  }
+  for (const rf of hist.refunds ?? []) {
+    snippets.push({ source_type: "refund", id: String(rf.refund_id ?? ""), date: String(rf.created_at ?? ""), text: String(rf.reason_text ?? "") });
+  }
+  return snippets;
+}
+
 export function enrichSoldoutRow(
   raw: Record<string, unknown>,
-  marksByMerchant: Map<string, MarkInfo>
+  marksByMerchant: Map<string, MarkInfo>,
+  signalOverride?: CachedSignalEntry,
+  liveTextHash?: string
 ): EnrichedSoldout {
   const merchantId = String(raw.merchant_id ?? "");
   const dealId = String(raw.deal_id ?? "");
   const meta = getMerchantMeta(merchantId);
-  const sig = getMerchantSignal(merchantId);
+  const sig = signalOverride ?? getMerchantSignal(merchantId);
+  const bundleHash = computeMerchantTextHash(getBundleTextSnippets(merchantId));
+  const currentHash = liveTextHash ?? bundleHash;
+  const knownHash = signalOverride?.source_hash ?? (BUNDLE.signals[merchantId] ? bundleHash : undefined);
+  const pendingAi = currentHash !== "empty" && currentHash !== knownHash;
   const sched = BUNDLE.active_schedule_deals[dealId];
 
   const sizeBand = String(raw.size_band ?? meta?.size_band ?? "C");
@@ -161,5 +190,7 @@ export function enrichSoldoutRow(
     signal: sig,
     mark,
     valuation,
+    pending_ai: pendingAi,
+    text_hash: currentHash,
   };
 }

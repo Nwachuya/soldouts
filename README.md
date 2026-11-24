@@ -55,9 +55,10 @@ $$\text{Net EV (£)} = \text{Gross GP Lift} - \text{Rep Slot Cost (£5.50 call /
 Assigns each sold-out to `CALL`, `CALL_CALLBACK`, `ASSIST_DEAL_OR_LINK`, `PAUSE_SCHEDULE`, `HOLD_CAP_RISK`, or `DONT_BOTHER`.
 
 ### 3. Routing Change (`routing/routing/plan.py`)
-- Wired `suppress_soldout_tasks` (off by default) and `load_suppressions()`, honoring `config/env_overrides.json` precedence for instant single-switch rollback.
+- Wired `suppress_soldout_tasks` (off by default) and `load_suppressions()`, honoring `config/env_overrides.json` precedence. **Per Greg Lindqvist's ruling, because `plan.py` is a code change, the switch stays `false` through Peak freeze and targets January (> 7 Jan).**
+- **Rollback**: Switching `suppress_soldout_tasks` to `false` in `config/env_overrides.json` (or `PUT /routing/switch`) returns to today's list on the next run with **no code deploy**.
 - **Explicit `callback_promised` rule**: `callback_promised == "1"` beats `suppressions.csv` so promised callbacks are never dropped; `do_not_contact == "1"` and Ops `suppressed_deal_ids` drop unconditionally.
-- **Greg's opt-out rule**: `scripts/generate_suppressions.py` suppresses active `auto_replenish_schedules` deals (`1,101` rows) and **rep-confirmed marks (`source: rep_mark`) only**—never unreviewed AI detector output.
+- **V1 suppression scope**: `scripts/generate_suppressions.py` seeds **`1,101` active auto-replenish deals** (as of `2026-11-25`, 80% treatment arm); rep-mark opt-outs are excluded from v1 until Ops agrees an expiry rule.
 
 ### 4. Holdout & Realistic £ Range (`scripts/holdout_readout.py`)
 - **80% Treatment (`2,401` merchants) / 20% Holdout (`599` merchants)** via deterministic `(size_band, category)`-stratified `sha256` at `merchant_id` granularity (`pre_period_gp_diff_gbp = +£0.18`, `95% CI: [-£0.87, +£1.18]`).

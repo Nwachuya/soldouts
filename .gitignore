@@ -14,6 +14,7 @@ __pycache__/
 web/node_modules/
 web/.next/
 web/out/
+web/.cache/
 
 # Raw exercise pack (14MB CSVs & briefing docs; offline tests use synthetic fixtures)
 plans-directives/

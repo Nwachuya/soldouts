@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { readRuntimeCache, writeRuntimeCache } from "@/lib/cacheStore";
 import { OFFLINE_MARKS } from "@/lib/offlineMarks";
 import { sandboxFetch } from "@/lib/sandbox";
 
@@ -25,10 +26,16 @@ export async function PUT(
     if (!res.ok) {
       return NextResponse.json({ error: data.detail || `Sandbox error ${res.status}` }, { status: res.status });
     }
+    const cache = readRuntimeCache();
+    cache.marks_snapshot[id] = { mark, reason, marked_by };
+    writeRuntimeCache(cache);
     return NextResponse.json({ mode: "live_sandbox", mark: { mark, reason, marked_by }, raw: data });
   } catch {
     const saved = { mark, reason, marked_by };
     OFFLINE_MARKS.set(id, saved);
+    const cache = readRuntimeCache();
+    cache.marks_snapshot[id] = saved;
+    writeRuntimeCache(cache);
     return NextResponse.json({
       mode: "offline_local",
       mark: saved,
@@ -50,9 +57,15 @@ export async function DELETE(
     if (!res.ok && res.status !== 404) {
       return NextResponse.json({ error: `Sandbox error ${res.status}` }, { status: res.status });
     }
+    const cache = readRuntimeCache();
+    delete cache.marks_snapshot[id];
+    writeRuntimeCache(cache);
     return NextResponse.json({ mode: "live_sandbox", deleted: true });
   } catch {
     OFFLINE_MARKS.delete(id);
+    const cache = readRuntimeCache();
+    delete cache.marks_snapshot[id];
+    writeRuntimeCache(cache);
     return NextResponse.json({ mode: "offline_local", deleted: true });
   }
 }

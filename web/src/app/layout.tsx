@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
+import { NavSyncTimestamp } from "@/components/NavSyncTimestamp";
+import { SyncStatusDrawer } from "@/components/SyncStatusDrawer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <CheckCircle2 className="w-5 h-5 text-[#53a318] shrink-0" />
               <span className="truncate">UK Local Sold-Outs</span>
             </Link>
-            <span className="text-caption shrink-0">Pre-Freeze Triage</span>
+            <NavSyncTimestamp />
           </div>
         </header>
 
@@ -32,9 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <CheckCircle2 className="w-4 h-4 text-[#53a318] shrink-0" />
               <span>UK Local Sold-Outs</span>
             </Link>
-            <span className="text-caption">
-              Deterministic EV in code · Substring-verified quotes · Read-only routing status
-            </span>
+            <SyncStatusDrawer />
           </div>
         </footer>
       </body>

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { readRuntimeCache } from "@/lib/cacheStore";
 import { BUNDLE, getMerchantMeta, getMerchantSignal } from "@/lib/enrich";
 import { OFFLINE_MARKS } from "@/lib/offlineMarks";
 import { sandboxFetch } from "@/lib/sandbox";
@@ -10,10 +11,11 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
+  const cache = readRuntimeCache();
   const meta = getMerchantMeta(id);
-  const signal = getMerchantSignal(id);
+  const signal = cache.signals_overrides[id] ?? getMerchantSignal(id);
 
-  let mode: "live_sandbox" | "offline_fallback" = "live_sandbox";
+  let mode: "live_sandbox" | "offline_cached" | "offline_fallback" = "live_sandbox";
   let merchant: Record<string, unknown> | null = meta ? { merchant_id: id, ...meta } : null;
   let notes: Array<Record<string, unknown>> = [];
   let replies: Array<Record<string, unknown>> = [];
@@ -39,8 +41,9 @@ export async function GET(
     if (rfRes.ok) refunds = (await rfRes.json()).data ?? [];
     if (sRes.ok) schedules = (await sRes.json()).data ?? [];
   } catch {
-    mode = "offline_fallback";
-    const hist = BUNDLE.history?.[id];
+    const cachedHist = cache.history_overrides[id];
+    mode = cachedHist ? "offline_cached" : "offline_fallback";
+    const hist = cachedHist ?? BUNDLE.history?.[id];
     if (hist) {
       notes = hist.notes;
       replies = hist.replies;
@@ -49,7 +52,7 @@ export async function GET(
       schedules = hist.schedules;
     }
     if (merchant) {
-      merchant = { ...merchant, mark: OFFLINE_MARKS.get(id) ?? null };
+      merchant = { ...merchant, mark: OFFLINE_MARKS.get(id) ?? cache.marks_snapshot[id] ?? null };
     }
   }
 
