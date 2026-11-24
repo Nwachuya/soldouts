@@ -1,0 +1,134 @@
+[
+  {
+    "name": "high_value_band_a_call",
+    "input": {
+      "size_band": "A",
+      "value_30d_gbp": 534.92,
+      "signal": "neutral",
+      "capacity_risk": false,
+      "refund_ratio": 0.05,
+      "has_active_schedule": false,
+      "do_not_contact": false,
+      "callback_promised": false,
+      "already_restocked": false,
+      "rep_mark": null
+    },
+    "expected": {
+      "action": "CALL",
+      "gross_lift_gbp": 20.94,
+      "rep_time_cost_gbp": 5.5,
+      "refund_risk_penalty_gbp": 1.05,
+      "net_ev_gbp": 14.39
+    }
+  },
+  {
+    "name": "band_d_low_ev_skip",
+    "input": {
+      "size_band": "D",
+      "value_30d_gbp": 24.79,
+      "signal": "neutral",
+      "capacity_risk": false,
+      "refund_ratio": 0.04,
+      "has_active_schedule": false,
+      "do_not_contact": false,
+      "callback_promised": false,
+      "already_restocked": false,
+      "rep_mark": null
+    },
+    "expected": {
+      "action": "DONT_BOTHER",
+      "gross_lift_gbp": 1.21,
+      "rep_time_cost_gbp": 5.5,
+      "refund_risk_penalty_gbp": 0.05,
+      "net_ev_gbp": -4.34
+    }
+  },
+  {
+    "name": "active_auto_replenish_skip",
+    "input": {
+      "size_band": "B",
+      "value_30d_gbp": 165.33,
+      "signal": "neutral",
+      "capacity_risk": false,
+      "refund_ratio": 0.05,
+      "has_active_schedule": true,
+      "do_not_contact": false,
+      "callback_promised": false,
+      "already_restocked": false,
+      "rep_mark": null
+    },
+    "expected": {
+      "action": "DONT_BOTHER",
+      "gross_lift_gbp": 0.0,
+      "rep_time_cost_gbp": 0.0,
+      "refund_risk_penalty_gbp": 0.0,
+      "net_ev_gbp": 0.0
+    }
+  },
+  {
+    "name": "pause_auto_replenish_conflict",
+    "input": {
+      "size_band": "B",
+      "value_30d_gbp": 160.12,
+      "signal": "pause_auto_replenish",
+      "capacity_risk": false,
+      "refund_ratio": 0.04,
+      "has_active_schedule": true,
+      "do_not_contact": false,
+      "callback_promised": false,
+      "already_restocked": false,
+      "rep_mark": null
+    },
+    "expected": {
+      "action": "PAUSE_SCHEDULE",
+      "gross_lift_gbp": 0.0,
+      "rep_time_cost_gbp": 3.0,
+      "refund_risk_penalty_gbp": 0.0,
+      "net_ev_gbp": -3.0
+    }
+  },
+  {
+    "name": "portal_assist_warm_reply",
+    "input": {
+      "size_band": "B",
+      "value_30d_gbp": 134.38,
+      "signal": "portal_or_terms_assist",
+      "capacity_risk": false,
+      "refund_ratio": 0.03,
+      "has_active_schedule": false,
+      "do_not_contact": false,
+      "callback_promised": false,
+      "already_restocked": false,
+      "rep_mark": null
+    },
+    "expected": {
+      "action": "ASSIST_DEAL_OR_LINK",
+      "gross_lift_gbp": 8.5,
+      "rep_time_cost_gbp": 3.0,
+      "refund_risk_penalty_gbp": 0.26,
+      "net_ev_gbp": 5.24
+    }
+  },
+  {
+    "name": "capacity_risk_hold_cap",
+    "input": {
+      "size_band": "A",
+      "value_30d_gbp": 199.08,
+      "signal": "capacity_refund_risk",
+      "capacity_risk": true,
+      "refund_ratio": 0.16,
+      "has_active_schedule": false,
+      "do_not_contact": false,
+      "callback_promised": false,
+      "already_restocked": false,
+      "rep_mark": null
+    },
+    "expected": {
+      "action": "HOLD_CAP_RISK",
+      "gross_lift_gbp": 6.41,
+      "rep_time_cost_gbp": 5.5,
+      "refund_risk_penalty_gbp": 2.63,
+      "net_ev_gbp": -1.72
+    }
+  }
+]

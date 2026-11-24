@@ -1,0 +1,29 @@
+{
+  "calibration_note": "Within-merchant fixed-effects 30d GP lift after removing active auto-replenish (5,690), Feb 2026 Deal Alert noise (1,400), and pre-call self-restocks (500).",
+  "rep_slot_cost_gbp": 5.5,
+  "assist_slot_cost_gbp": 3.0,
+  "minutes_per_task": 12,
+  "hourly_loaded_cost_gbp": 27.5,
+  "lift_rate_by_band": {
+    "A": 0.055,
+    "B": 0.048,
+    "C": 0.035,
+    "D": 0.030
+  },
+  "empirical_fe_lift_gbp": {
+    "A": 8.23,
+    "B": 6.06,
+    "C": 2.58,
+    "D": 1.92
+  },
+  "signal_multipliers": {
+    "eager_restock": 1.35,
+    "portal_or_terms_assist": 1.35,
+    "ooo_temporary": 0.5,
+    "neutral": 1.0,
+    "capacity_refund_risk": 0.65,
+    "merchant_opt_out": 0.0,
+    "pause_auto_replenish": 0.0,
+    "self_served": 0.0
+  }
+}
