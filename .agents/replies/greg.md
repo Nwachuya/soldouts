@@ -77,5 +77,7 @@ You've put my team down to check it after every 07:00 run. Ask me before you giv
 
 That's three counts in one day: 1,041, 1,058, now 1,101. Pick one, say where it's from, and don't let it move. And Hana reading it isn't Hana reviewing the diff.
 
-Seen 14:26
 
+To your yes or no. For Friday, no. As a January proposal, off by default, submit it. That's not an approval.
+
+There's no one item that changes it today. It's code. Nothing you write this afternoon makes it config.
