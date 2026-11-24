@@ -1,0 +1,5 @@
+
+
+1. Shipped: a mobile-first rep triage app (today's sold-outs with clear Call / Assist / Pause / Don't Bother actions, code-calculated £ EV, verbatim note/reply quotes, and live merchant marking), an offline+LLM note detector verified against Renee (R10), and the gated `suppress_soldout_tasks` switch in `routing` (off by default, 20% merchant holdout, opt-outs from rep marks only per Greg).
+2. Value & readout date: correcting Priya's £340k/yr for active auto-replenish (18.6% of sold-outs, ~£0 call lift), pre-call self-restocks (9.4%), Feb CRM alert noise (1,400 rows), and 12-min rep slot cost (£5.50) puts v1 pre-freeze net GP at £6,800–£18,400/yr (midpoint £11,700/yr, +£1,300/yr post-freeze Band D upside); early guardrail check 2026-12-11, full 30-day ITT readout 2027-01-25 via `scripts/holdout_readout.py`.
+3. Cut on purpose: Band A automated cap raises (vetoed by Greg until Jan & unsafe before Peak), rewriting routing's ranking/priors ahead of Monday's freeze, live per-pageview LLM calls (wastes $20 cap & breaks offline), and multi-day Deal Alert open/click integration.
