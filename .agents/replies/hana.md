@@ -1,0 +1,3 @@
+env_overrides.json only has priors.restock (0.46 / 0.43). nothing on suppressed_deal_ids. so no clash there. importer: new columns go at the end, it cares about order.
+
+callbacks and carry-over: today callbacks go first, leftovers carry over and show overdue. whether suppression should beat a promised callback is your rule to propose, and Greg's to accept. i'd want it stated in the diff. suppressions.csv is empty and nothing reads it yet, so how it gets fed is part of what you're proposing. i'd ask who keeps it up to date.
