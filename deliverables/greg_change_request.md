@@ -10,7 +10,7 @@
 - **Code (`routing/routing/plan.py`)**: Wires the pre-plumbed `suppress_soldout_tasks` flag and `routing.suppressions.load_suppressions()` into `is_active()` and `build_plan()`. When `false` (default), output is byte-for-byte identical to v2.15.0.
 - **Explicit `callback_promised` Rule (stated in diff per Hana)**: `callback_promised == "1"` **beats** `suppressions.csv` so promised rep callbacks are never silently dropped; `do_not_contact == "1"` and Ops `suppressed_deal_ids` continue to drop unconditionally.
 - **Scope (`deliverables/suppressions_treatment.csv` → `input/suppressions.csv`)**: Strictly limited per Greg's conditions to:
-  1. **Active auto-replenish deals** (`1,058` deals from `auto_replenish_schedules.csv`, `source: merchant_ops_schedules`), excluding merchants with a recent pause conflict note (`pause_auto_replenish`).
+  1. **Active auto-replenish deals** (`1,101` deals from `auto_replenish_schedules.csv`, `source: merchant_ops_schedules`), excluding merchants with a recent pause conflict note (`pause_auto_replenish`).
   2. **Rep-confirmed opt-outs only** (`source: rep_mark` via `PUT /merchants/{id}/mark`, `no_call` / `seasonal_pause` / `capacity_full`) — **never** unreviewed AI note-detector output.
   - Applied to **80% Treatment merchants only** (`2,401` merchants); **20% Holdout (`599` merchants)** remain untouched for unbiased measurement.
 - **Ownership & Feeding**: **Merchant Ops** owns `input/suppressions.csv`. Seeded once pre-freeze (`2026-11-25`) before Monday's freeze; post-freeze (`> 2027-01-07`), refreshed nightly before the 07:00 run via `scripts/generate_suppressions.py`.

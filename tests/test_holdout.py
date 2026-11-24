@@ -46,6 +46,8 @@ class HoldoutTest(unittest.TestCase):
                 f"schedule_id,deal_id,merchant_id,start_date,end_date,cadence,top_up_qty,created_by\n"
                 f"AR1,D1,{t_mid},2025-01-01,,weekly,10,ops\n"
                 f"AR2,D2,{h_mid},2025-01-01,,weekly,10,ops\n"
+                f"AR3,D3,{t_mid},2025-01-01,2027-06-01,weekly,10,ops\n"
+                f"AR4,D4,{t_mid},2025-01-01,2026-01-01,weekly,10,ops\n"
             )
             sig_path = tmp / "signals.json"
             sig_path.write_text(json.dumps({"signals": {t_mid: {"signal": "neutral"}, t_opt_mid: {"signal": "merchant_opt_out"}, h_mid: {"signal": "merchant_opt_out"}}}))
@@ -55,9 +57,10 @@ class HoldoutTest(unittest.TestCase):
 
             counts = generate_suppressions(data_dir, sig_path, out_csv, added_on="2026-11-25", marks_path=marks_path)
             loaded = load_suppressions(out_csv)
-            self.assertEqual(len(loaded), 2)
+            self.assertEqual(len(loaded), 3)
+            self.assertEqual({r["deal_id"] for r in loaded if r["deal_id"]}, {"D1", "D3"})
             self.assertEqual({r["merchant_id"] for r in loaded}, {t_mid, t_opt_mid})
-            self.assertEqual(counts["auto_replenish_deals"], 1)
+            self.assertEqual(counts["auto_replenish_deals"], 2)
             self.assertEqual(counts["rep_mark_opt_outs"], 1)
             self.assertEqual(counts["holdout_merchants"], 2)
 

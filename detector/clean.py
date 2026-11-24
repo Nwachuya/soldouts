@@ -55,6 +55,15 @@ def read_csv_rows(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(f))
 
 
+def is_schedule_active(row: dict[str, str], as_of_date: str) -> bool:
+    """Return True if an auto-replenish schedule is active on as_of_date (YYYY-MM-DD)."""
+    start = (row.get("start_date") or "").strip()
+    end = (row.get("end_date") or "").strip()
+    if start and start > as_of_date:
+        return False
+    return not end or end >= as_of_date
+
+
 def clean_notes(
     notes: list[dict[str, str]],
     merchant_rep_map: dict[str, str] | None = None,

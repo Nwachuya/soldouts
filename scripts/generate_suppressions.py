@@ -7,7 +7,7 @@ import json
 from datetime import date
 from pathlib import Path
 
-from detector.clean import read_csv_rows
+from detector.clean import is_schedule_active, read_csv_rows
 from scripts.holdout import stratified_assign_arms
 
 
@@ -52,7 +52,7 @@ def generate_suppressions(
 
     # 1. Active auto-replenish deals (excluding merchants with a pause conflict note)
     for sc in schedules:
-        if (sc.get("end_date") or "").strip():
+        if not is_schedule_active(sc, added_on):
             continue
         mid = sc["merchant_id"]
         did = sc["deal_id"]

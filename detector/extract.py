@@ -9,10 +9,11 @@ import urllib.error
 import urllib.request
 from collections import defaultdict
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 from typing import Any
 
-from detector.clean import clean_activities, clean_notes, clean_replies, fix_mojibake, read_csv_rows
+from detector.clean import clean_activities, clean_notes, clean_replies, fix_mojibake, is_schedule_active, read_csv_rows
 
 # Priority order when choosing the primary actionable signal for a merchant.
 SIGNAL_PRIORITY = {
@@ -282,8 +283,10 @@ def run_detection(
     max_usd: float = 2.50,
     base_url: str | None = None,
     api_key: str | None = None,
+    as_of_date: str | None = None,
 ) -> dict[str, Any]:
     """Run cleaning + extraction over a CSV data directory and return structured payload."""
+    as_of = as_of_date or date.today().isoformat()
     merchants = read_csv_rows(input_dir / "merchants.csv")
     merchant_rep_map = {m["merchant_id"]: m.get("rep_id", "") for m in merchants}
 
@@ -299,7 +302,7 @@ def run_detection(
     replies, reply_stats = clean_replies(replies_raw)
     _, activity_stats = clean_activities(activities_raw)
 
-    active_schedule_merchants = {s["merchant_id"] for s in schedules_raw if not (s.get("end_date") or "").strip()}
+    active_schedule_merchants = {s["merchant_id"] for s in schedules_raw if is_schedule_active(s, as_of)}
     gp_totals: dict[str, float] = defaultdict(float)
     ref_totals: dict[str, float] = defaultdict(float)
     for mm in mmonths_raw:

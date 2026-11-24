@@ -57,7 +57,7 @@ Assigns each sold-out to `CALL`, `CALL_CALLBACK`, `ASSIST_DEAL_OR_LINK`, `PAUSE_
 ### 3. Routing Change (`routing/routing/plan.py`)
 - Wired `suppress_soldout_tasks` (off by default) and `load_suppressions()`, honoring `config/env_overrides.json` precedence for instant single-switch rollback.
 - **Explicit `callback_promised` rule**: `callback_promised == "1"` beats `suppressions.csv` so promised callbacks are never dropped; `do_not_contact == "1"` and Ops `suppressed_deal_ids` drop unconditionally.
-- **Greg's opt-out rule**: `scripts/generate_suppressions.py` suppresses active `auto_replenish_schedules` deals (`1,058` rows) and **rep-confirmed marks (`source: rep_mark`) only**—never unreviewed AI detector output.
+- **Greg's opt-out rule**: `scripts/generate_suppressions.py` suppresses active `auto_replenish_schedules` deals (`1,101` rows) and **rep-confirmed marks (`source: rep_mark`) only**—never unreviewed AI detector output.
 
 ### 4. Holdout & Realistic £ Range (`scripts/holdout_readout.py`)
 - **80% Treatment (`2,401` merchants) / 20% Holdout (`599` merchants)** via deterministic `(size_band, category)`-stratified `sha256` at `merchant_id` granularity (`pre_period_gp_diff_gbp = +£0.18`, `95% CI: [-£0.87, +£1.18]`).
